@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.clusterat</groupId>
-    <artifactId>api</artifactId>
+    <artifactId>live</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>api</name>
-    <description>api</description>
+    <name>live</name>
+    <description>live</description>
     <url/>
     <licenses>
         <license/>

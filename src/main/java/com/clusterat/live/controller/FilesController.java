@@ -29,16 +29,16 @@ public class FilesController {
 
                     return filesService.store(filePart)
                             .then(Mono.just(
-                                    ResponseEntity.ok("File saved successful: " + filename)
+                                    ResponseEntity.ok("File uploaded successfully: " + filename)
                             ));
                 })
                 .onErrorResume(e -> Mono.just(
                         ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body("Error saving the file: " + e.getMessage())
+                                .body("Failed to upload file: " + e.getMessage())
                 ))
                 .switchIfEmpty(Mono.just(
                         ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body("Required file part 'file' is not present.")
+                                .body("File part is required")
                 ));
     }
 }

@@ -1,4 +1,4 @@
-package com.clusterat.api.service;
+package com.clusterat.live.service;
 
 import net.sourceforge.tess4j.TesseractException;
 import org.junit.jupiter.api.Test;

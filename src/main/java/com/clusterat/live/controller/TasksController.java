@@ -1,4 +1,4 @@
-package com.clusterat.api.controller;
+package com.clusterat.live.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

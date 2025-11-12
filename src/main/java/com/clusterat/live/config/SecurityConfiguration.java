@@ -1,4 +1,4 @@
-package com.clusterat.api.config;
+package com.clusterat.live.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

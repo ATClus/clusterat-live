@@ -1,4 +1,4 @@
-package com.clusterat.api.config;
+package com.clusterat.live.config;
 
 import net.sourceforge.tess4j.Tesseract;
 import org.springframework.context.annotation.Bean;

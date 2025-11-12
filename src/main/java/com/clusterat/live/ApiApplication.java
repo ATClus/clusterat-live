@@ -1,4 +1,4 @@
-package com.clusterat.api;
+package com.clusterat.live;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

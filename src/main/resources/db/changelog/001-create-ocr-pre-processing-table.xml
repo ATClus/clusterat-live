@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="001-create-ocr-pre-processing-table" author="clusterat">
+        <createTable tableName="ocr_pre_processing" remarks="Armazena os resultados do pré-processamento OCR de documentos">
+            <column name="id" type="VARCHAR(36)" remarks="Identificador único do registro (UUID)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="document_id" type="VARCHAR(255)" remarks="ID do documento processado">
+                <constraints nullable="false"/>
+            </column>
+            <column name="document_name" type="VARCHAR(500)" remarks="Nome original do documento">
+                <constraints nullable="false"/>
+            </column>
+            <column name="extracted_text" type="TEXT" remarks="Texto extraído via OCR de todas as imagens do documento"/>
+            <column name="image_count" type="INTEGER" remarks="Número de imagens processadas"/>
+            <column name="processing_status" type="VARCHAR(50)" remarks="Status do processamento: processing, completed, failed"/>
+            <column name="created_at" type="TIMESTAMP" remarks="Data de criação do registro">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" remarks="Data da última atualização">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_message" type="TEXT" remarks="Mensagem de erro caso o processamento falhe"/>
+        </createTable>
+
+        <createIndex indexName="idx_ocr_document_id" tableName="ocr_pre_processing">
+            <column name="document_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_ocr_processing_status" tableName="ocr_pre_processing">
+            <column name="processing_status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_ocr_created_at" tableName="ocr_pre_processing">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
+

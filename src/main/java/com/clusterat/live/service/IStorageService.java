@@ -6,6 +6,4 @@ import reactor.core.publisher.Mono;
 public interface IStorageService {
     void init();
     Mono<Void> store(FilePart file);
-//    void load();
-//    void delete();
 }

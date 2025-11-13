@@ -135,4 +135,28 @@ public class OcrPreProcessingService {
     public List<OcrPreProcessingModel> getAllOcrRecords() {
         return ocrPreProcessingRepository.findAll();
     }
+
+    @Transactional
+    public void deleteOcrPreProcessing(String documentIdOrId) {
+        log.info("Attempting to delete OCR pre-processing with id/document_id: {}", documentIdOrId);
+
+        Optional<OcrPreProcessingModel> ocrPreProcessingModel = ocrPreProcessingRepository.findByDocumentId(documentIdOrId);
+        log.debug("Search by document_id result: {}", ocrPreProcessingModel.isPresent() ? "found" : "not found");
+
+        if (ocrPreProcessingModel.isEmpty()) {
+            log.debug("Trying to find by primary key id: {}", documentIdOrId);
+            ocrPreProcessingModel = ocrPreProcessingRepository.findById(documentIdOrId);
+            log.debug("Search by id result: {}", ocrPreProcessingModel.isPresent() ? "found" : "not found");
+        }
+
+        OcrPreProcessingModel modelToDelete = ocrPreProcessingModel
+                .orElseThrow(() -> {
+                    log.error("OCR pre-processing data not found with document_id or id: {}", documentIdOrId);
+                    return new RuntimeException("OCR pre processed data not found with document_id or id: " + documentIdOrId);
+                });
+
+        log.info("Found record to delete: id={}, document_id={}", modelToDelete.getId(), modelToDelete.getDocumentId());
+        ocrPreProcessingRepository.delete(modelToDelete);
+        log.info("Successfully deleted OCR pre-processing record with id/document_id: {}", documentIdOrId);
+    }
 }

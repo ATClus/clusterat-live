@@ -5,6 +5,7 @@ import com.clusterat.live.dto.FinancialAnalysisDTO;
 import com.clusterat.live.dto.OcrPreProcessingDTO;
 import com.clusterat.live.service.FinancialAnalysisDataService;
 import com.clusterat.live.service.FinancialAnalysisService;
+import com.clusterat.live.service.OcrPreProcessingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,13 +21,16 @@ import java.util.Optional;
 public class FinancialAnalysisController {
     private final FinancialAnalysisService financialAnalysisService;
     private final FinancialAnalysisDataService financialAnalysisDataService;
+    private final OcrPreProcessingService ocrPreProcessingService;
 
     @Autowired
     public FinancialAnalysisController(
             FinancialAnalysisService financialAnalysisService,
-            FinancialAnalysisDataService financialAnalysisDataService) {
+            FinancialAnalysisDataService financialAnalysisDataService,
+            OcrPreProcessingService ocrPreProcessingService) {
         this.financialAnalysisService = financialAnalysisService;
         this.financialAnalysisDataService = financialAnalysisDataService;
+        this.ocrPreProcessingService = ocrPreProcessingService;
     }
 
     @GetMapping("/ocr-data")
@@ -54,19 +58,15 @@ public class FinancialAnalysisController {
         log.info("GET request to fetch OCR pre-processing data by id: {}", id);
         try {
             Optional<OcrPreProcessingDTO> data = financialAnalysisDataService.getOcrPreProcessingById(id);
-            if (data.isPresent()) {
-                return ResponseEntity.ok(AnalysisResponseDTO.builder()
-                        .success(true)
-                        .message("OCR pre-processing data retrieved successfully")
-                        .data(data.get())
-                        .build());
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(AnalysisResponseDTO.builder()
-                                .success(false)
-                                .message("OCR pre-processing data not found")
-                                .build());
-            }
+            return data.map(ocrPreProcessingDTO -> ResponseEntity.ok(AnalysisResponseDTO.builder()
+                    .success(true)
+                    .message("OCR pre-processing data retrieved successfully")
+                    .data(ocrPreProcessingDTO)
+                    .build())).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(AnalysisResponseDTO.builder()
+                            .success(false)
+                            .message("OCR pre-processing data not found")
+                            .build()));
         } catch (Exception e) {
             log.error("Error fetching OCR pre-processing data by id: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -246,6 +246,32 @@ public class FinancialAnalysisController {
                     .body(AnalysisResponseDTO.builder()
                             .success(false)
                             .message("Error deleting financial analysis: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    @DeleteMapping("/ocr-pre-processing/{ocrId}")
+    public ResponseEntity<OcrPreProcessingDTO> deleteOCRPreProcessedData(@PathVariable String ocrId) {
+        log.info("DELETE request to delete OCR pre-processing data with id or document_id: {}", ocrId);
+        try {
+            ocrPreProcessingService.deleteOcrPreProcessing(ocrId);
+            return ResponseEntity.ok(OcrPreProcessingDTO.builder()
+                    .success(true)
+                    .message("OCR pre-processing data deleted successfully")
+                    .build());
+        } catch (RuntimeException e) {
+            log.warn("OCR pre-processing data not found: {}", ocrId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(OcrPreProcessingDTO.builder()
+                            .success(false)
+                            .message("OCR pre-processing data not found")
+                            .build());
+        } catch (Exception e) {
+            log.error("Error deleting OCR pre-processing data with id or document_id: {}", ocrId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(OcrPreProcessingDTO.builder()
+                            .success(false)
+                            .message("Error deleting OCR pre-processing data: " + e.getMessage())
                             .build());
         }
     }

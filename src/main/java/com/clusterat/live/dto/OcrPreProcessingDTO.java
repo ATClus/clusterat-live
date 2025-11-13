@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OcrResultResponseDTO {
+public class OcrPreProcessingDTO {
+    private String id;
     private String documentId;
     private String documentName;
     private String extractedText;

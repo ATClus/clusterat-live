@@ -116,5 +116,31 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="005-create-brightdata-received-data-table" author="clusterat">
+        <createTable tableName="brightdata_received_data" remarks="Dados recebidos da API Brightdata">
+            <column name="id" type="BIGSERIAL" remarks="Identificador único">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="data" type="JSONB" remarks="Dados em formato JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_received" type="TIMESTAMP WITH TIME ZONE" defaultValueComputed="NOW()" remarks="Data e hora de recebimento dos dados">
+                <constraints nullable="false"/>
+            </column>
+            <column name="processed" type="BOOLEAN" defaultValue="false" remarks="Indica se os dados foram processados">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_processed" type="TIMESTAMP WITH TIME ZONE" remarks="Data e hora do processamento dos dados"/>
+        </createTable>
+
+        <createIndex indexName="idx_brightdata_received_data_processed" tableName="brightdata_received_data">
+            <column name="processed"/>
+        </createIndex>
+
+        <createIndex indexName="idx_brightdata_received_data_date_received" tableName="brightdata_received_data">
+            <column name="date_received"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
 

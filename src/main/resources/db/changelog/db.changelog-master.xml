@@ -7,6 +7,7 @@
 
     <include file="db/changelog/001-create-ocr-pre-processing-table.xml"/>
     <include file="db/changelog/002-create-financial-analysis-tables.xml"/>
+    <include file="db/changelog/005-fix-id-column-types.xml"/>
     <include file="db/changelog/003-create-rental-properties-table.xml"/>
     <include file="db/changelog/004-create-job-postings-table.xml"/>
 

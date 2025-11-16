@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/financial-analysis")
+@RequestMapping("/v1/financial-analysis")
 public class FinancialAnalysisController {
     private final FinancialAnalysisService financialAnalysisService;
     private final FinancialAnalysisDataService financialAnalysisDataService;

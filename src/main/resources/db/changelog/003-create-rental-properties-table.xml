@@ -6,8 +6,9 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="003-create-rental-properties-table" author="clusterat">
+        <validCheckSum>9:7342b1ce74b8b80e9c9cdab1732bd548</validCheckSum>
         <createTable tableName="rental_properties" remarks="Armazena informações de propriedades para aluguel">
-            <column name="id" type="SERIAL" remarks="Identificador único do registro">
+            <column name="id" type="BIGSERIAL" remarks="Identificador único do registro">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="property_code" type="VARCHAR(50)" remarks="Código identificador da propriedade na fonte">
@@ -62,4 +63,3 @@
     </changeSet>
 
 </databaseChangeLog>
-

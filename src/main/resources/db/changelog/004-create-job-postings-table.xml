@@ -6,8 +6,9 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="004-create-job-postings-table" author="clusterat">
+        <validCheckSum>9:e8733cfc38a6bcfcec84cc57ab3029ad</validCheckSum>
         <createTable tableName="job_postings" remarks="Stores job posting information">
-            <column name="id" type="SERIAL" remarks="Unique record identifier">
+            <column name="id" type="BIGSERIAL" remarks="Unique record identifier">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="job_posting_id" type="VARCHAR(50)" remarks="Job posting identifier from source">
@@ -67,4 +68,3 @@
     </changeSet>
 
 </databaseChangeLog>
-

@@ -122,6 +122,7 @@ public class DocProcessorService {
             String response = restClient.post()
                     .uri(pythonProcessorUrl + "/api/v1/documents/process")
                     .header("X-API-KEY", pythonProcessorApiKey)
+                    .contentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA)
                     .body(body)
                     .retrieve()
                     .body(String.class);

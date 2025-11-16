@@ -22,10 +22,22 @@ public class OcrService {
 
         if (os.contains("mac")) {
             System.setProperty("jna.library.path", "/opt/homebrew/Cellar/tesseract/5.5.1/lib:/opt/homebrew/Cellar/leptonica/1.86.0/lib");
+            log.info("Configured JNA library path for macOS (Homebrew)");
         } else if (os.contains("linux")) {
-            System.setProperty("jna.library.path", "/home/linuxbrew/.linuxbrew/Cellar/tesseract/5.5" +
-                    ".1_1/lib/:/home/linuxbrew/.linuxbrew/Cellar/leptonica/1.86.0/lib/");
+            String jnaLibPath = "/usr/lib/x86_64-linux-gnu:/usr/lib:/lib/x86_64-linux-gnu:/lib";
+
+            String linuxbrewPath = "/home/linuxbrew/.linuxbrew/Cellar/tesseract/5.5.1_1/lib/:/home/linuxbrew/.linuxbrew/Cellar/leptonica/1.86.0/lib/";
+            if (new java.io.File("/home/linuxbrew/.linuxbrew").exists()) {
+                jnaLibPath = linuxbrewPath + ":" + jnaLibPath;
+                log.info("Configured JNA library path for Linux (Linuxbrew + system)");
+            } else {
+                log.info("Configured JNA library path for Linux (system apt installation)");
+            }
+
+            System.setProperty("jna.library.path", jnaLibPath);
         }
+
+        log.info("JNA library path: {}", System.getProperty("jna.library.path"));
     }
 
     public String extractText(String imagePath) throws TesseractException {

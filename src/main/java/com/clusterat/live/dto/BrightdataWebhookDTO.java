@@ -14,8 +14,6 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BrightdataWebhookDTO {
-    // Brightdata pode enviar dados em diversos formatos
-    // Este DTO aceita qualquer estrutura JSON usando @JsonAnySetter
     @Builder.Default
     private Map<String, Object> data = new HashMap<>();
 

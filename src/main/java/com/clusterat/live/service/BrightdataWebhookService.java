@@ -1,6 +1,5 @@
 package com.clusterat.live.service;
 
-import com.clusterat.live.dto.BrightdataWebhookDTO;
 import com.clusterat.live.model.BrightdataReceivedDataModel;
 import com.clusterat.live.repository.BrightdataReceivedDataRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,63 +24,61 @@ public class BrightdataWebhookService {
     }
 
     @Transactional
-    public BrightdataReceivedDataModel receiveWebhookData(BrightdataWebhookDTO webhookData) {
+    public BrightdataReceivedDataModel receiveWebhookData(Object webhookData) {
         try {
-            log.info("Recebendo dados do webhook Brightdata");
+            log.info("Receiving Brightdata webhook data");
 
-            // Converter o DTO para JSON string
-            String jsonData = objectMapper.writeValueAsString(webhookData.getData());
+            String jsonData = objectMapper.writeValueAsString(webhookData);
 
-            // Criar o modelo de dados
+            log.debug("Received JSON: {}", jsonData);
+
             BrightdataReceivedDataModel model = BrightdataReceivedDataModel.builder()
                     .data(jsonData)
                     .dateReceived(OffsetDateTime.now())
                     .processed(false)
                     .build();
 
-            // Salvar no banco de dados
             BrightdataReceivedDataModel savedModel = brightdataRepository.save(model);
-            log.info("Dados do Brightdata salvos com sucesso. ID: {}", savedModel.getId());
+            log.info("Brightdata data saved successfully. ID: {}", savedModel.getId());
 
             return savedModel;
         } catch (Exception e) {
-            log.error("Erro ao receber e salvar dados do webhook Brightdata", e);
-            throw new RuntimeException("Erro ao processar webhook Brightdata: " + e.getMessage(), e);
+            log.error("Error receiving and saving Brightdata webhook data", e);
+            throw new RuntimeException("Error processing Brightdata webhook: " + e.getMessage(), e);
         }
     }
 
     @Transactional(readOnly = true)
     public List<BrightdataReceivedDataModel> getUnprocessedData() {
-        log.info("Buscando dados não processados do Brightdata");
+        log.info("Fetching unprocessed Brightdata data");
         return brightdataRepository.findUnprocessedDataOrderByDateReceived();
     }
 
     @Transactional
     public void markAsProcessed(Long id) {
-        log.info("Marcando dados como processados. ID: {}", id);
+        log.info("Marking data as processed. ID: {}", id);
         brightdataRepository.findById(id).ifPresent(data -> {
             data.setProcessed(true);
             data.setDateProcessed(OffsetDateTime.now());
             brightdataRepository.save(data);
-            log.info("Dados marcados como processados. ID: {}", id);
+            log.info("Data marked as processed. ID: {}", id);
         });
     }
 
     @Transactional
     public void markAsProcessed(Long id, OffsetDateTime processedDate) {
-        log.info("Marcando dados como processados com data específica. ID: {}", id);
+        log.info("Marking data as processed with specific date. ID: {}", id);
         brightdataRepository.findById(id).ifPresent(data -> {
             data.setProcessed(true);
             data.setDateProcessed(processedDate);
             brightdataRepository.save(data);
-            log.info("Dados marcados como processados. ID: {}", id);
+            log.info("Data marked as processed. ID: {}", id);
         });
     }
 
     @Transactional(readOnly = true)
     public List<BrightdataReceivedDataModel> getDataByDateRange(OffsetDateTime startDate, OffsetDateTime endDate) {
-        log.info("Buscando dados Brightdata entre {} e {}", startDate, endDate);
+        log.info("Fetching Brightdata data between {} and {}", startDate, endDate);
         return brightdataRepository.findByDateReceivedBetween(startDate, endDate);
     }
 }
-

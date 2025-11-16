@@ -1,6 +1,5 @@
 package com.clusterat.live.service;
 
-import com.clusterat.live.dto.BrightdataWebhookDTO;
 import com.clusterat.live.model.BrightdataReceivedDataModel;
 import com.clusterat.live.repository.BrightdataReceivedDataRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,11 +36,9 @@ class BrightdataWebhookServiceTest {
     @Test
     void testReceiveWebhookData_Success() throws Exception {
         // Arrange
-        BrightdataWebhookDTO webhookDTO = new BrightdataWebhookDTO();
         Map<String, Object> data = new HashMap<>();
         data.put("field1", "value1");
         data.put("field2", "value2");
-        webhookDTO.setData(data);
 
         String jsonData = "{\"field1\":\"value1\",\"field2\":\"value2\"}";
         when(objectMapper.writeValueAsString(any())).thenReturn(jsonData);
@@ -56,7 +53,7 @@ class BrightdataWebhookServiceTest {
         when(repository.save(any(BrightdataReceivedDataModel.class))).thenReturn(savedModel);
 
         // Act
-        BrightdataReceivedDataModel result = service.receiveWebhookData(webhookDTO);
+        BrightdataReceivedDataModel result = service.receiveWebhookData(data);
 
         // Assert
         assertNotNull(result);
@@ -68,9 +65,39 @@ class BrightdataWebhookServiceTest {
     }
 
     @Test
+    void testReceiveWebhookData_Array() throws Exception {
+        // Arrange
+        List<Map<String, Object>> arrayData = new ArrayList<>();
+        Map<String, Object> item1 = new HashMap<>();
+        item1.put("property_title", "Apartamento 3 Quartos");
+        item1.put("property_code", "85744");
+        arrayData.add(item1);
+
+        String jsonData = "[{\"property_title\":\"Apartamento 3 Quartos\",\"property_code\":\"85744\"}]";
+        when(objectMapper.writeValueAsString(any())).thenReturn(jsonData);
+
+        BrightdataReceivedDataModel savedModel = BrightdataReceivedDataModel.builder()
+                .id(1L)
+                .data(jsonData)
+                .dateReceived(OffsetDateTime.now())
+                .processed(false)
+                .build();
+
+        when(repository.save(any(BrightdataReceivedDataModel.class))).thenReturn(savedModel);
+
+        // Act
+        BrightdataReceivedDataModel result = service.receiveWebhookData(arrayData);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(jsonData, result.getData());
+        verify(repository, times(1)).save(any(BrightdataReceivedDataModel.class));
+    }
+
+    @Test
     void testReceiveWebhookData_EmptyData() throws Exception {
         // Arrange
-        BrightdataWebhookDTO webhookDTO = new BrightdataWebhookDTO();
+        Map<String, Object> data = new HashMap<>();
         String jsonData = "{}";
         when(objectMapper.writeValueAsString(any())).thenReturn(jsonData);
 
@@ -84,7 +111,7 @@ class BrightdataWebhookServiceTest {
         when(repository.save(any(BrightdataReceivedDataModel.class))).thenReturn(savedModel);
 
         // Act
-        BrightdataReceivedDataModel result = service.receiveWebhookData(webhookDTO);
+        BrightdataReceivedDataModel result = service.receiveWebhookData(data);
 
         // Assert
         assertNotNull(result);

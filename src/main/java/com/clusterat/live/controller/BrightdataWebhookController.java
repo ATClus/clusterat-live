@@ -1,6 +1,5 @@
 package com.clusterat.live.controller;
 
-import com.clusterat.live.dto.BrightdataWebhookDTO;
 import com.clusterat.live.model.BrightdataReceivedDataModel;
 import com.clusterat.live.service.BrightdataWebhookService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/webhooks/brightdata")
+@RequestMapping("/v1/webhooks/brightdata")
 public class BrightdataWebhookController {
     private final BrightdataWebhookService brightdataWebhookService;
 
@@ -25,47 +24,47 @@ public class BrightdataWebhookController {
     }
 
     /**
-     * Endpoint para receber dados do webhook Brightdata
+     * Endpoint to receive Brightdata webhook data
      * POST /api/v1/webhooks/brightdata/receive
      *
-     * @param webhookData Dados enviados pelo Brightdata
-     * @return Resposta com ID do registro salvo
+     * @param webhookData Data sent by Brightdata (accepts Object to support arrays and objects)
+     * @return Response with saved record ID
      */
     @PostMapping("/receive")
-    public ResponseEntity<Map<String, Object>> receiveWebhookData(@RequestBody BrightdataWebhookDTO webhookData) {
+    public ResponseEntity<Map<String, Object>> receiveWebhookData(@RequestBody Object webhookData) {
         try {
-            log.info("Webhook Brightdata recebido");
+            log.info("Brightdata webhook received");
             BrightdataReceivedDataModel savedData = brightdataWebhookService.receiveWebhookData(webhookData);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", "Dados recebidos e salvos com sucesso");
+            response.put("message", "Data received and saved successfully");
             response.put("id", savedData.getId());
             response.put("dateReceived", savedData.getDateReceived());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            log.error("Erro ao processar webhook Brightdata", e);
+            log.error("Error processing Brightdata webhook", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Erro ao processar webhook: " + e.getMessage());
+            errorResponse.put("message", "Error processing webhook: " + e.getMessage());
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
     /**
-     * Endpoint para buscar dados não processados
+     * Endpoint to fetch unprocessed data
      * GET /api/v1/webhooks/brightdata/unprocessed
-     * AUTENTICAÇÃO REQUERIDA:
-     * Header: X-API-Key: [sua-chave-api]
+     * REQUIRED AUTHENTICATION:
+     * Header: X-API-Key: [your-api-key]
      *
-     * @return Lista de dados não processados
+     * @return List of unprocessed data
      */
     @GetMapping("/unprocessed")
     public ResponseEntity<Map<String, Object>> getUnprocessedData() {
         try {
-            log.info("Buscando dados não processados do Brightdata");
+            log.info("Fetching unprocessed Brightdata data");
             List<BrightdataReceivedDataModel> unprocessedData = brightdataWebhookService.getUnprocessedData();
 
             Map<String, Object> response = new HashMap<>();
@@ -75,60 +74,59 @@ public class BrightdataWebhookController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("Erro ao buscar dados não processados", e);
+            log.error("Error fetching unprocessed data", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Erro ao buscar dados: " + e.getMessage());
+            errorResponse.put("message", "Error fetching data: " + e.getMessage());
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
     /**
-     * Endpoint para receber dados do webhook Brightdata
-     * POST /api/v1/webhooks/brightdata/receive
-     * AUTENTICAÇÃO REQUERIDA:
-     * Header: X-API-Key: [sua-chave-api]
+     * Endpoint to mark data as processed
+     * PUT /api/v1/webhooks/brightdata/{id}/mark-processed
+     * REQUIRED AUTHENTICATION:
+     * Header: X-API-Key: [your-api-key]
      *
-     * @param webhookData Dados enviados pelo Brightdata
-     * @return Resposta com ID do registro salvo
+     * @param id ID of the record to be marked as processed
+     * @return Response with success or error
      */
     @PutMapping("/{id}/mark-processed")
     public ResponseEntity<Map<String, Object>> markAsProcessed(@PathVariable Long id) {
         try {
-            log.info("Marcando dados como processados. ID: {}", id);
+            log.info("Marking data as processed. ID: {}", id);
             brightdataWebhookService.markAsProcessed(id);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", "Dados marcados como processados");
+            response.put("message", "Data marked as processed");
             response.put("id", id);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("Erro ao marcar dados como processados", e);
+            log.error("Error marking data as processed", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Erro ao marcar como processado: " + e.getMessage());
+            errorResponse.put("message", "Error marking as processed: " + e.getMessage());
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
     /**
-     * Health check do webhook
+     * Webhook health check
      * GET /api/v1/webhooks/brightdata/health
      *
-     * @return Status do webhook
+     * @return Webhook status
      */
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> healthCheck() {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
         response.put("service", "Brightdata Webhook");
-        response.put("message", "Webhook Brightdata está operacional");
+        response.put("message", "Brightdata webhook is operational");
 
         return ResponseEntity.ok(response);
     }
 }
-

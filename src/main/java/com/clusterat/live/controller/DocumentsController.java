@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/documents")
+@RequestMapping("/v1/documents")
 public class DocumentsController {
     private final DocProcessorService docProcessorService;
     private final FilesService filesService;

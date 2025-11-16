@@ -1,5 +1,7 @@
 package com.clusterat.live.config;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,10 +12,16 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Configuration
 class ApiKeyConfiguration implements ServerSecurityContextRepository {
     private static final String API_KEY_HEADER = "X-API-Key";
-    private static final String VALID_API_KEY = "759852";
+
+    @Value("${api.security.key}")
+    private String validApiKey;
+
+    @Value("${api.security.enabled:true}")
+    private boolean securityEnabled;
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
@@ -22,9 +30,8 @@ class ApiKeyConfiguration implements ServerSecurityContextRepository {
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
-        String apiKey = exchange.getRequest().getHeaders().getFirst(API_KEY_HEADER);
-
-        if (apiKey != null && apiKey.equals(VALID_API_KEY)) {
+        if (!securityEnabled) {
+            log.warn("API Security is DISABLED - allowing all requests");
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     "api-user",
                     null,
@@ -33,6 +40,21 @@ class ApiKeyConfiguration implements ServerSecurityContextRepository {
             return Mono.just(new SecurityContextImpl(auth));
         }
 
+        String apiKey = exchange.getRequest().getHeaders().getFirst(API_KEY_HEADER);
+
+        if (apiKey != null && apiKey.equals(validApiKey)) {
+            log.debug("Valid API key provided");
+            Authentication auth = new UsernamePasswordAuthenticationToken(
+                    "api-user",
+                    null,
+                    AuthorityUtils.createAuthorityList("ROLE_USER")
+            );
+            return Mono.just(new SecurityContextImpl(auth));
+        }
+
+        log.warn("Invalid or missing API key for request: {} {}",
+                exchange.getRequest().getMethod(),
+                exchange.getRequest().getPath());
         return Mono.empty();
     }
 }

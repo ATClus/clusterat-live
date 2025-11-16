@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1/files")
+@RequestMapping("/v1/files")
 public class FilesController {
     private final FilesService filesService;
 

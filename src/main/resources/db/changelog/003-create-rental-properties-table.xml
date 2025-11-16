@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="003-create-rental-properties-table" author="clusterat">
+        <createTable tableName="rental_properties" remarks="Armazena informações de propriedades para aluguel">
+            <column name="id" type="SERIAL" remarks="Identificador único do registro">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="property_code" type="VARCHAR(50)" remarks="Código identificador da propriedade na fonte">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_title" type="VARCHAR(255)" remarks="Título/nome da propriedade"/>
+            <column name="building_name" type="VARCHAR(255)" remarks="Nome do edifício/condomínio"/>
+            <column name="property_type" type="VARCHAR(100)" remarks="Tipo de propriedade (apartamento, casa, etc)"/>
+            <column name="property_address" type="TEXT" remarks="Endereço completo da propriedade"/>
+            <column name="neighborhood" type="VARCHAR(150)" remarks="Bairro da propriedade"/>
+            <column name="city" type="VARCHAR(150)" remarks="Cidade da propriedade"/>
+            <column name="private_area_sqm" type="DECIMAL(10,2)" remarks="Área privativa em metros quadrados"/>
+            <column name="bedrooms" type="SMALLINT" remarks="Número de quartos" defaultValue="0"/>
+            <column name="suites" type="SMALLINT" remarks="Número de suítes" defaultValue="0"/>
+            <column name="parking_spaces" type="SMALLINT" remarks="Número de vagas de garagem" defaultValue="0"/>
+            <column name="rental_price" type="DECIMAL(10,2)" remarks="Preço de aluguel">
+                <constraints nullable="false"/>
+            </column>
+            <column name="condominium_fee" type="DECIMAL(10,2)" remarks="Taxa de condomínio"/>
+            <column name="iptu_tax" type="DECIMAL(10,2)" remarks="Imposto IPTU"/>
+            <column name="fire_insurance" type="DECIMAL(10,2)" remarks="Seguro contra incêndio"/>
+            <column name="garbage_collection_fee" type="DECIMAL(10,2)" remarks="Taxa de coleta de lixo"/>
+            <column name="total_monthly_cost" type="DECIMAL(10,2)" remarks="Custo mensal total">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type" type="VARCHAR(50)" remarks="Tipo de transação" defaultValue="Aluguel"/>
+            <column name="payment_methods" type="TEXT" remarks="Métodos de pagamento disponíveis"/>
+            <column name="source_url" type="TEXT" remarks="URL da fonte de dados">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scraped_at" type="TIMESTAMP WITH TIME ZONE" remarks="Data e hora da coleta dos dados" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <addUniqueConstraint
+                columnNames="property_code,source_url"
+                constraintName="uk_property_code_source"
+                tableName="rental_properties"/>
+
+        <createIndex indexName="idx_neighborhood" tableName="rental_properties">
+            <column name="neighborhood"/>
+        </createIndex>
+
+        <createIndex indexName="idx_total_monthly_cost" tableName="rental_properties">
+            <column name="total_monthly_cost"/>
+        </createIndex>
+
+        <createIndex indexName="idx_features" tableName="rental_properties">
+            <column name="bedrooms"/>
+            <column name="suites"/>
+            <column name="parking_spaces"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
+

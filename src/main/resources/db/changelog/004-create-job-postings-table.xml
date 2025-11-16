@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="004-create-job-postings-table" author="clusterat">
+        <createTable tableName="job_postings" remarks="Stores job posting information">
+            <column name="id" type="SERIAL" remarks="Unique record identifier">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="job_posting_id" type="VARCHAR(50)" remarks="Job posting identifier from source">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_title" type="VARCHAR(255)" remarks="Job title">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_url" type="TEXT" remarks="Source URL of the job posting">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_name" type="VARCHAR(255)" remarks="Company name"/>
+            <column name="company_url" type="TEXT" remarks="Company URL"/>
+            <column name="external_company_id" type="VARCHAR(50)" remarks="External company identifier"/>
+            <column name="job_location" type="VARCHAR(255)" remarks="Job location"/>
+            <column name="employment_type" type="VARCHAR(100)" remarks="Employment type (Full-time, Part-time, etc)"/>
+            <column name="seniority_level" type="VARCHAR(100)" remarks="Seniority level"/>
+            <column name="job_function" type="VARCHAR(255)" remarks="Job function"/>
+            <column name="job_industries" type="VARCHAR(255)" remarks="Job industries"/>
+            <column name="job_summary_text" type="TEXT" remarks="Job summary/description text"/>
+            <column name="salary_currency" type="VARCHAR(10)" remarks="Salary currency"/>
+            <column name="salary_min" type="DECIMAL(12,2)" remarks="Minimum salary"/>
+            <column name="salary_max" type="DECIMAL(12,2)" remarks="Maximum salary"/>
+            <column name="salary_payment_period" type="VARCHAR(50)" remarks="Salary payment period"/>
+            <column name="apply_link" type="TEXT" remarks="Application link"/>
+            <column name="is_easy_apply" type="BOOLEAN" remarks="Is easy apply available" defaultValueBoolean="false"/>
+            <column name="is_application_available" type="BOOLEAN" remarks="Is application available" defaultValueBoolean="true"/>
+            <column name="num_applicants" type="SMALLINT" remarks="Number of applicants"/>
+            <column name="job_poster_name" type="VARCHAR(255)" remarks="Job poster name"/>
+            <column name="job_poster_title" type="VARCHAR(255)" remarks="Job poster title"/>
+            <column name="job_posted_at" type="TIMESTAMP WITH TIME ZONE" remarks="Job posting date"/>
+            <column name="scraped_at" type="TIMESTAMP WITH TIME ZONE" remarks="Data scraping timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                columnNames="job_posting_id"
+                constraintName="uk_job_posting_id"
+                tableName="job_postings"/>
+
+        <createIndex indexName="idx_job_company_name" tableName="job_postings">
+            <column name="company_name"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_location" tableName="job_postings">
+            <column name="job_location"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_posted_at" tableName="job_postings">
+            <column name="job_posted_at" descending="true"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_seniority" tableName="job_postings">
+            <column name="seniority_level"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
+

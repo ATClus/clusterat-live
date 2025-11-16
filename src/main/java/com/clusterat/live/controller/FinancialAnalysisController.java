@@ -195,6 +195,37 @@ public class FinancialAnalysisController {
         }
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<AnalysisResponseDTO> saveAnalysisBulk(@RequestBody List<FinancialAnalysisDTO> analysisDTOs) {
+        log.info("POST request to save {} financial analysis records", analysisDTOs.size());
+        try {
+            for (FinancialAnalysisDTO dto : analysisDTOs) {
+                if (dto.getAmount() == null || dto.getCategoryId() == null || dto.getTransactionDate() == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(AnalysisResponseDTO.builder()
+                                    .success(false)
+                                    .message("Missing required fields in one or more records: amount, categoryId, and transactionDate are mandatory")
+                                    .build());
+                }
+            }
+
+            List<FinancialAnalysisDTO> saved = financialAnalysisService.saveAnalysisBulk(analysisDTOs);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(AnalysisResponseDTO.builder()
+                            .success(true)
+                            .message(String.format("Successfully saved %d financial analysis records", saved.size()))
+                            .data(saved)
+                            .build());
+        } catch (Exception e) {
+            log.error("Error saving financial analysis records", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(AnalysisResponseDTO.builder()
+                            .success(false)
+                            .message("Error saving financial analysis records: " + e.getMessage())
+                            .build());
+        }
+    }
+
     @PutMapping("/{analysisId}")
     public ResponseEntity<AnalysisResponseDTO> updateAnalysis(
             @PathVariable Long analysisId,

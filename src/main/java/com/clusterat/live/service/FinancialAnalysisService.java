@@ -69,6 +69,13 @@ public class FinancialAnalysisService {
         return convertToDTO(saved);
     }
 
+    public List<FinancialAnalysisDTO> saveAnalysisBulk(List<FinancialAnalysisDTO> analysisDTOs) {
+        log.info("Saving {} financial analysis records", analysisDTOs.size());
+        return analysisDTOs.stream()
+                .map(this::saveAnalysis)
+                .collect(Collectors.toList());
+    }
+
     public FinancialAnalysisDTO updateAnalysis(Long analysisId, FinancialAnalysisDTO analysisDTO) {
         log.info("Updating financial analysis with id: {}", analysisId);
         Optional<FinancialAnalysisModel> existing = financialAnalysisRepository.findById(analysisId);

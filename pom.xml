@@ -149,6 +149,7 @@
                 <configuration>
                     <testFramework>JUNIT5</testFramework>
                     <testMode>WEBTESTCLIENT</testMode>
+                    <failOnNoContracts>false</failOnNoContracts>
                 </configuration>
             </plugin>
             <plugin>
@@ -187,6 +188,14 @@
                         </exclude>
                     </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

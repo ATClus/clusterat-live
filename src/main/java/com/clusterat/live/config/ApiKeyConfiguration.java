@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @Configuration
 class ApiKeyConfiguration implements ServerSecurityContextRepository {
     private static final String API_KEY_HEADER = "X-API-Key";
-    private static final String VALID_API_KEY = "XxXXXXXXXxX";
+    private static final String VALID_API_KEY = "759852";
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {

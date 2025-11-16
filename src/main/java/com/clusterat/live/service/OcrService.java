@@ -17,7 +17,15 @@ public class OcrService {
 
     public OcrService(Tesseract tesseract) {
         this.tesseract = tesseract;
-        System.setProperty("jna.library.path", "/opt/homebrew/Cellar/tesseract/5.5.1/lib:/opt/homebrew/Cellar/leptonica/1.86.0/lib");
+
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("mac")) {
+            System.setProperty("jna.library.path", "/opt/homebrew/Cellar/tesseract/5.5.1/lib:/opt/homebrew/Cellar/leptonica/1.86.0/lib");
+        } else if (os.contains("linux")) {
+            System.setProperty("jna.library.path", "/home/linuxbrew/.linuxbrew/Cellar/tesseract/5.5" +
+                    ".1_1/lib/:/home/linuxbrew/.linuxbrew/Cellar/leptonica/1.86.0/lib/");
+        }
     }
 
     public String extractText(String imagePath) throws TesseractException {

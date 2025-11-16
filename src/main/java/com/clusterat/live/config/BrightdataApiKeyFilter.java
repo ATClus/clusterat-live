@@ -10,13 +10,11 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-/**
- * WebFilter para validar API Key do Brightdata em requisições ao webhook
- */
 @Slf4j
 @Component
 public class BrightdataApiKeyFilter implements WebFilter {
     private static final String API_KEY_HEADER = "X-API-Key";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BRIGHTDATA_WEBHOOK_PATH = "/api/v1/webhooks/brightdata";
 
     @Value("${brightdata.webhook.api-key:}")
@@ -34,46 +32,75 @@ public class BrightdataApiKeyFilter implements WebFilter {
 
         String path = exchange.getRequest().getPath().value();
 
-        // Aplicar validação apenas para endpoints do Brightdata
         if (path.startsWith(BRIGHTDATA_WEBHOOK_PATH)) {
             if (!brightdataWebhookEnabled) {
-                log.warn("Tentativa de acesso ao webhook Brightdata desabilitado");
+                log.warn("Attempt to access disabled Brightdata webhook");
                 exchange.getResponse().setStatusCode(HttpStatus.SERVICE_UNAVAILABLE);
                 return exchange.getResponse().setComplete();
             }
 
-            // Health check não requer API Key
             if (path.endsWith("/health")) {
-                log.debug("Acesso ao health check permitido sem autenticação");
+                log.debug("Access to health check allowed without authentication");
                 return chain.filter(exchange);
             }
 
-            // Validar API Key para outros endpoints
-            String apiKey = exchange.getRequest().getHeaders().getFirst(API_KEY_HEADER);
+            String apiKey = extractApiKey(exchange);
 
-            log.debug("Validando API Key. Configurada: '{}', Enviada: '{}'", brightdataApiKey, apiKey);
+            log.debug("Validating API Key. Configured: '{}', Sent: '{}'", brightdataApiKey, apiKey);
 
-            // Verificar se a API Key está configurada
             if (brightdataApiKey == null || brightdataApiKey.trim().isEmpty()) {
-                log.error("Erro crítico: brightdata.webhook.api-key não está configurada em application.properties");
-                return returnUnauthorized(exchange, "Webhook não está configurado corretamente no servidor");
+                log.error("Critical error: brightdata.webhook.api-key is not configured in application.properties");
+                return returnUnauthorized(exchange, "Webhook is not configured correctly on the server");
             }
 
             if (apiKey == null || apiKey.trim().isEmpty()) {
-                log.warn("Requisição ao webhook Brightdata sem API Key. Path: {}", path);
-                return returnUnauthorized(exchange, "API Key não fornecida");
+                log.warn("Request to Brightdata webhook without API Key. Path: {}", path);
+                return returnUnauthorized(exchange, "API Key not provided");
             }
 
             if (!apiKey.equals(brightdataApiKey)) {
-                log.warn("Requisição ao webhook Brightdata com API Key inválida. Path: {} | Esperada: {} | Recebida: {}",
+                log.warn("Request to Brightdata webhook with invalid API Key. Path: {} | Expected: {} | Received: {}",
                     path, brightdataApiKey, apiKey);
-                return returnUnauthorized(exchange, "API Key inválida");
+                return returnUnauthorized(exchange, "Invalid API Key");
             }
 
-            log.debug("Requisição ao webhook Brightdata autorizada. Path: {}", path);
+            log.debug("Request to Brightdata webhook authorized. Path: {}", path);
         }
 
         return chain.filter(exchange);
+    }
+
+    private String extractApiKey(ServerWebExchange exchange) {
+        String apiKey = exchange.getRequest().getHeaders().getFirst(API_KEY_HEADER);
+
+        if (apiKey != null && !apiKey.trim().isEmpty()) {
+            log.debug("API Key found in X-API-Key header");
+            return apiKey.trim();
+        }
+
+        String authHeader = exchange.getRequest().getHeaders().getFirst(AUTHORIZATION_HEADER);
+
+        if (authHeader != null && !authHeader.trim().isEmpty()) {
+            log.debug("Trying to extract API Key from Authorization header: '{}'", authHeader);
+
+            if (authHeader.startsWith("X-API-Key:")) {
+                apiKey = authHeader.substring("X-API-Key:".length()).trim();
+                log.debug("API Key extracted from Authorization header (X-API-Key: format)");
+                return apiKey;
+            }
+
+            if (authHeader.startsWith("Bearer ")) {
+                apiKey = authHeader.substring("Bearer ".length()).trim();
+                log.debug("API Key extracted from Authorization header (Bearer format)");
+                return apiKey;
+            }
+
+            log.debug("Using direct value from Authorization header");
+            return authHeader.trim();
+        }
+
+        log.debug("No API Key found in headers");
+        return null;
     }
 
     private Mono<Void> returnUnauthorized(ServerWebExchange exchange, String message) {
@@ -91,5 +118,3 @@ public class BrightdataApiKeyFilter implements WebFilter {
                         .wrap(errorBody.getBytes())));
     }
 }
-
-

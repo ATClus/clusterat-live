@@ -30,6 +30,18 @@ class ApiKeyConfiguration implements ServerSecurityContextRepository {
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
+        // Brightdata webhook has its own authentication filter (BrightdataApiKeyFilter)
+        String path = exchange.getRequest().getPath().value();
+        if (path.startsWith("/v1/webhooks/brightdata")) {
+            log.debug("Skipping global API key validation for Brightdata webhook path: {}", path);
+            Authentication auth = new UsernamePasswordAuthenticationToken(
+                    "brightdata-webhook",
+                    null,
+                    AuthorityUtils.createAuthorityList("ROLE_USER")
+            );
+            return Mono.just(new SecurityContextImpl(auth));
+        }
+
         if (!securityEnabled) {
             log.warn("API Security is DISABLED - allowing all requests");
             Authentication auth = new UsernamePasswordAuthenticationToken(

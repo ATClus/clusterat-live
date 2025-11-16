@@ -24,7 +24,6 @@ class SecurityConfiguration {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .securityContextRepository(apiKeyConfiguration)
                 .authorizeExchange(auth -> auth
-                        .pathMatchers("/v1/webhooks/brightdata/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/v1/**").authenticated()
                         .anyExchange().permitAll()

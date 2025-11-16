@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 public class BrightdataApiKeyFilter implements WebFilter {
     private static final String API_KEY_HEADER = "X-API-Key";
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BRIGHTDATA_WEBHOOK_PATH = "/api/v1/webhooks/brightdata";
+    private static final String BRIGHTDATA_WEBHOOK_PATH = "/v1/webhooks/brightdata";
 
     @Value("${brightdata.webhook.api-key:}")
     private String brightdataApiKey;
@@ -46,7 +46,13 @@ public class BrightdataApiKeyFilter implements WebFilter {
 
             String apiKey = extractApiKey(exchange);
 
-            log.debug("Validating API Key. Configured: '{}', Sent: '{}'", brightdataApiKey, apiKey);
+            log.info("=== API KEY VALIDATION DEBUG ===");
+            log.info("Configured API Key: [{}] (length: {})", brightdataApiKey,
+                brightdataApiKey != null ? brightdataApiKey.length() : 0);
+            log.info("Received API Key: [{}] (length: {})", apiKey,
+                apiKey != null ? apiKey.length() : 0);
+            log.info("Keys are equal: {}", apiKey != null && apiKey.equals(brightdataApiKey));
+            log.info("=== END DEBUG ===");
 
             if (brightdataApiKey == null || brightdataApiKey.trim().isEmpty()) {
                 log.error("Critical error: brightdata.webhook.api-key is not configured in application.properties");
@@ -81,21 +87,21 @@ public class BrightdataApiKeyFilter implements WebFilter {
         String authHeader = exchange.getRequest().getHeaders().getFirst(AUTHORIZATION_HEADER);
 
         if (authHeader != null && !authHeader.trim().isEmpty()) {
-            log.debug("Trying to extract API Key from Authorization header: '{}'", authHeader);
+            log.info("Authorization header found: [{}] (length: {})", authHeader, authHeader.length());
 
             if (authHeader.startsWith("X-API-Key:")) {
                 apiKey = authHeader.substring("X-API-Key:".length()).trim();
-                log.debug("API Key extracted from Authorization header (X-API-Key: format)");
+                log.info("API Key extracted from Authorization header (X-API-Key: format): [{}]", apiKey);
                 return apiKey;
             }
 
             if (authHeader.startsWith("Bearer ")) {
                 apiKey = authHeader.substring("Bearer ".length()).trim();
-                log.debug("API Key extracted from Authorization header (Bearer format)");
+                log.info("API Key extracted from Authorization header (Bearer format): [{}]", apiKey);
                 return apiKey;
             }
 
-            log.debug("Using direct value from Authorization header");
+            log.info("Using direct value from Authorization header: [{}]", authHeader.trim());
             return authHeader.trim();
         }
 

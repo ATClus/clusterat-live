@@ -12,10 +12,10 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class RentalPropertyService {
+public class RentalPropertyMCPService {
     private final com.clusterat.live.service.RentalPropertyService rentalPropertyService;
 
-    public RentalPropertyService(com.clusterat.live.service.RentalPropertyService rentalPropertyService) {
+    public RentalPropertyMCPService(com.clusterat.live.service.RentalPropertyService rentalPropertyService) {
         this.rentalPropertyService = rentalPropertyService;
     }
 

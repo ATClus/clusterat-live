@@ -30,6 +30,13 @@ public class RentalPropertyService {
                 .collect(Collectors.toList());
     }
 
+    public List<RentalPropertyDTO> getLatestProperties() {
+        log.info("Fetching latest 10 properties");
+        return rentalPropertyRepository.findTop10ByOrderByScrapedAtDesc().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     public Optional<RentalPropertyDTO> getPropertyById(Long id) {
         log.info("Fetching rental property with id: {}", id);
         return rentalPropertyRepository.findById(id)

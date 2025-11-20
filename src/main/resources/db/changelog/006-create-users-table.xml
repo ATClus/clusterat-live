@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="009" author="clusterat">
+        <createTable tableName="users" remarks="Usuários e seus respectivos ids para o serviço whatsapp">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)" remarks="Nome do usuário">
+                <constraints nullable="false"/>
+            </column>
+            <column name="wpp_id" type="VARCHAR(50)" remarks="Id único do serviço whatsapp">
+                <constraints unique="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValue="now()"
+                    remarks="Data criação do usuário">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="users" indexName="idx_users_wpp_id">
+            <column name="wpp_id"/>
+        </createIndex>
+
+        <createIndex tableName="users" indexName="idx_users_name">
+            <column name="name"/>
+        </createIndex>
+
+        <createIndex tableName="users" indexName="idx_users_created_at">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -15,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -87,6 +90,23 @@ public class WorkoutSessionService {
             throw new IllegalArgumentException("Session not found");
         }
         workoutSessionRepository.deleteById(id);
+    }
+
+    @Transactional
+    public WorkoutSessionDTO endSession(UUID id, String observation) {
+        WorkoutSessionModel session = workoutSessionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        OffsetDateTime now = LocalDateTime.now().atOffset(ZoneOffset.UTC);
+        session.setEndedAt(now);
+
+        if (observation != null && !observation.isEmpty()) {
+            session.setObservation(observation);
+        }
+
+        WorkoutSessionModel saved = workoutSessionRepository.save(session);
+        log.info("Session ended with id: {}", id);
+        return toDTO(saved);
     }
 
     private void persistSets(WorkoutSessionModel session, List<WorkoutSetDTO> sets) {

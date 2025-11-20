@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="010" author="clusterat">
+        <createTable tableName="exercises" remarks="Lista de exercícios">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)" remarks="Nome do exercício">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT" remarks="Descrição do exercício">
+                <constraints nullable="false"/>
+            </column>
+            <column name="muscle_group" type="VARCHAR(50)" remarks="Grupo muscular">
+                <constraints nullable="false"/>
+            </column>
+            <column name="link_execution" type="varchar(255)" remarks="Vídeo ou gif da execução do exercício"/>
+        </createTable>
+        <createIndex tableName="exercises" indexName="idx_exercises_muscle_group">
+            <column name="muscle_group"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="011" author="clusterat">
+        <createTable tableName="workout_templates" remarks="Modelos de treino">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)" remarks="Nome do template">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_user_id" type="BIGINT" remarks="Usuário que criou o template"/>
+        </createTable>
+        <createIndex tableName="workout_templates" indexName="idx_workout_templates_created_by">
+            <column name="created_by_user_id"/>
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="workout_templates" baseColumnNames="created_by_user_id"
+                                 constraintName="fk_workout_templates_user_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="012" author="clusterat">
+        <createTable tableName="exercises_templates" remarks="Relação entre exercícios e templates">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="template_id" type="BIGINT" remarks="Template ao qual pertence">
+                <constraints nullable="false"/>
+            </column>
+            <column name="exercise_id" type="BIGINT" remarks="Exercício no template">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_order" type="INT" remarks="Ordem de exibição">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_sets" type="INT" defaultValue="4" remarks="Sets alvo"/>
+            <column name="target_reps" type="VARCHAR(20)" defaultValue="8-12" remarks="Reps alvo"/>
+            <column name="target_rest_sec" type="INT" defaultValue="60" remarks="Descanso alvo em segundos"/>
+        </createTable>
+        <createIndex tableName="exercises_templates" indexName="idx_exercises_templates_template">
+            <column name="template_id"/>
+        </createIndex>
+
+        <createIndex tableName="exercises_templates" indexName="idx_exercises_templates_exercise">
+            <column name="exercise_id"/>
+        </createIndex>
+
+        <createIndex tableName="exercises_templates" indexName="idx_exercises_templates_order">
+            <column name="template_id"/>
+            <column name="display_order"/>
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="exercises_templates" baseColumnNames="template_id"
+                                 constraintName="fk_exercises_templates_id_template"
+                                 referencedTableName="workout_templates"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="exercises_templates" baseColumnNames="exercise_id"
+                                 constraintName="fk_exercises_templates_id_exercise"
+                                 referencedTableName="exercises"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="013" author="clusterat">
+        <createTable tableName="workout_sessions" remarks="Representa o evento de ir à academia">
+            <column name="id" type="UUID" remarks="Identificador único da sessão">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT" remarks="Usuário que realizou o treino">
+                <constraints nullable="false"/>
+            </column>
+            <column name="template_id" type="BIGINT" remarks="Qual plano ele seguiu (Pode ser NULL se for treino livre)"/>
+            <column name="started_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="Início do treino">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ended_at" type="TIMESTAMP" remarks="Fim do treino"/>
+            <column name="observation" type="TEXT" remarks="Notas gerais do dia (Ex: 'Dormi mal, pouca energia')"/>
+        </createTable>
+        <createIndex tableName="workout_sessions" indexName="idx_workout_sessions_user">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="workout_sessions" indexName="idx_workout_sessions_template">
+            <column name="template_id"/>
+        </createIndex>
+
+        <createIndex tableName="workout_sessions" indexName="idx_workout_sessions_started_at">
+            <column name="started_at"/>
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="workout_sessions" baseColumnNames="user_id"
+                                 constraintName="fk_workout_sessions_user_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="workout_sessions" baseColumnNames="template_id"
+                                 constraintName="fk_workout_sessions_template_id"
+                                 referencedTableName="workout_templates"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="014" author="clusterat">
+        <createTable tableName="workout_sets" remarks="Granularidade máxima: cada linha é uma execução de série">
+            <column name="id" type="BIGINT" autoIncrement="true" remarks="Identificador único da série">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="session_id" type="UUID" remarks="Sessão de treino à qual pertence">
+                <constraints nullable="false"/>
+            </column>
+            <column name="exercise_id" type="BIGINT" remarks="Exercício realizado">
+                <constraints nullable="false"/>
+            </column>
+            <column name="set_order" type="INT" remarks="Ordem da série no exercício (1, 2, 3...)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reps" type="INT" remarks="Número de repetições realizadas">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight_kg" type="DECIMAL(5,2)" remarks="Peso utilizado em kg">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rpe" type="INT" remarks="Taxa de Esforço Percebido (1-10)"/>
+            <column name="rest_seconds" type="INT" remarks="Segundos de descanso antes dessa série"/>
+            <column name="is_warmup" type="BOOLEAN" defaultValue="false" remarks="Se foi aquecimento">
+                <constraints nullable="false"/>
+            </column>
+            <column name="performed_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="Quando a série foi realizada">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="workout_sets" indexName="idx_workout_sets_session">
+            <column name="session_id"/>
+        </createIndex>
+
+        <createIndex tableName="workout_sets" indexName="idx_workout_sets_exercise">
+            <column name="exercise_id"/>
+        </createIndex>
+
+        <createIndex tableName="workout_sets" indexName="idx_workout_sets_session_order">
+            <column name="session_id"/>
+            <column name="set_order"/>
+        </createIndex>
+
+        <createIndex tableName="workout_sets" indexName="idx_workout_sets_performed_at">
+            <column name="performed_at"/>
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="workout_sets" baseColumnNames="session_id"
+                                 constraintName="fk_workout_sets_session_id"
+                                 referencedTableName="workout_sessions"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="workout_sets" baseColumnNames="exercise_id"
+                                 constraintName="fk_workout_sets_exercise_id"
+                                 referencedTableName="exercises"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="015" author="clusterat">
+        <sql>
+            ALTER TABLE workout_sets
+            ADD CONSTRAINT ck_workout_sets_rpe_range
+            CHECK (rpe IS NULL OR (rpe >= 1 AND rpe &lt;= 10));
+        </sql>
+    </changeSet>
+</databaseChangeLog>

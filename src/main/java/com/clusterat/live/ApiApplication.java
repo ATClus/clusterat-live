@@ -2,6 +2,7 @@ package com.clusterat.live;
 
 import com.clusterat.live.mcp.RentalPropertyMCPService;
 import com.clusterat.live.mcp.SearXNGMCPService;
+import com.clusterat.live.mcp.WorkoutMCPService;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.boot.SpringApplication;
@@ -27,5 +28,10 @@ public class ApiApplication {
     @Bean
     public ToolCallbackProvider SearXNGTools(SearXNGMCPService searXNGMCPService) {
         return MethodToolCallbackProvider.builder().toolObjects(searXNGMCPService).build();
+    }
+
+    @Bean
+    public ToolCallbackProvider WorkoutTools(WorkoutMCPService workoutMCPService) {
+        return MethodToolCallbackProvider.builder().toolObjects(workoutMCPService).build();
     }
 }

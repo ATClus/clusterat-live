@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="004-create-job-postings-table" author="clusterat">
+    <changeSet id="007" author="clusterat">
         <validCheckSum>9:e8733cfc38a6bcfcec84cc57ab3029ad</validCheckSum>
         <createTable tableName="job_postings" remarks="Stores job posting information">
             <column name="id" type="BIGSERIAL" remarks="Unique record identifier">
@@ -64,6 +64,24 @@
 
         <createIndex indexName="idx_job_seniority" tableName="job_postings">
             <column name="seniority_level"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_postings_title" tableName="job_postings">
+            <column name="job_title"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_postings_location_employment" tableName="job_postings">
+            <column name="job_location"/>
+            <column name="employment_type"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_postings_company_source" tableName="job_postings">
+            <column name="company_name"/>
+            <column name="source_url"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_postings_scraped_at" tableName="job_postings">
+            <column name="scraped_at" descending="true"/>
         </createIndex>
     </changeSet>
 

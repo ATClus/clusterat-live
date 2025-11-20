@@ -5,15 +5,15 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="005-fix-id-column-types" author="clusterat">
+    <changeSet id="008" author="clusterat">
         <sql>
             DELETE FROM live.databasechangelog
-            WHERE id = '003-create-rental-properties-table'
+            WHERE id = '006'
             AND filename = 'db/changelog/003-create-rental-properties-table.xml';
         </sql>
         <sql>
             DELETE FROM live.databasechangelog
-            WHERE id = '004-create-job-postings-table'
+            WHERE id = '007'
             AND filename = 'db/changelog/004-create-job-postings-table.xml';
         </sql>
         <sql>

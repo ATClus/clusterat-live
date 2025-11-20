@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="001-create-ocr-pre-processing-table" author="clusterat">
+    <changeSet id="001" author="clusterat">
         <createTable tableName="ocr_pre_processing" remarks="Armazena os resultados do pré-processamento OCR de documentos">
             <column name="id" type="VARCHAR(36)" remarks="Identificador único do registro (UUID)">
                 <constraints primaryKey="true" nullable="false"/>
@@ -39,7 +39,15 @@
         <createIndex indexName="idx_ocr_created_at" tableName="ocr_pre_processing">
             <column name="created_at"/>
         </createIndex>
+
+        <createIndex indexName="idx_ocr_document_status" tableName="ocr_pre_processing">
+            <column name="document_id"/>
+            <column name="processing_status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_ocr_updated_at" tableName="ocr_pre_processing">
+            <column name="updated_at"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>
-

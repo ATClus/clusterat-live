@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="003-create-rental-properties-table" author="clusterat">
+    <changeSet id="006" author="clusterat">
         <validCheckSum>9:7342b1ce74b8b80e9c9cdab1732bd548</validCheckSum>
         <createTable tableName="rental_properties" remarks="Armazena informações de propriedades para aluguel">
             <column name="id" type="BIGSERIAL" remarks="Identificador único do registro">
@@ -59,6 +59,35 @@
             <column name="bedrooms"/>
             <column name="suites"/>
             <column name="parking_spaces"/>
+        </createIndex>
+
+        <createIndex indexName="idx_rental_properties_city" tableName="rental_properties">
+            <column name="city"/>
+        </createIndex>
+
+        <createIndex indexName="idx_rental_properties_scraped_at" tableName="rental_properties">
+            <column name="scraped_at" descending="true"/>
+        </createIndex>
+
+        <createIndex indexName="idx_rental_properties_rental_price" tableName="rental_properties">
+            <column name="rental_price"/>
+        </createIndex>
+
+        <createIndex indexName="idx_rental_properties_property_code" tableName="rental_properties">
+            <column name="property_code"/>
+        </createIndex>
+
+        <createIndex indexName="idx_rental_properties_source_url" tableName="rental_properties">
+            <column name="source_url"/>
+        </createIndex>
+
+        <createIndex indexName="idx_rental_properties_city_neighborhood" tableName="rental_properties">
+            <column name="city"/>
+            <column name="neighborhood"/>
+        </createIndex>
+
+        <createIndex indexName="idx_rental_properties_transaction_type" tableName="rental_properties">
+            <column name="transaction_type"/>
         </createIndex>
     </changeSet>
 

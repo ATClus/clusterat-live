@@ -77,6 +77,25 @@ public class WorkoutSessionController {
         }
     }
 
+    @PutMapping("/{sessionId}/end")
+    public ResponseEntity<AnalysisResponseDTO> endSession(@PathVariable UUID sessionId,
+                                                          @RequestParam(required = false) String observation) {
+        try {
+            WorkoutSessionDTO ended = workoutSessionService.endSession(sessionId, observation);
+            return ResponseEntity.ok(AnalysisResponseDTO.builder()
+                    .success(true)
+                    .message("Session ended")
+                    .data(ended)
+                    .build());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(AnalysisResponseDTO.builder()
+                            .success(false)
+                            .message(ex.getMessage())
+                            .build());
+        }
+    }
+
     @DeleteMapping("/{sessionId}")
     public ResponseEntity<AnalysisResponseDTO> delete(@PathVariable UUID sessionId) {
         try {

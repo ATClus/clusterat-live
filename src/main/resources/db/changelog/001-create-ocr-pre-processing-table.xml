@@ -6,6 +6,11 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="001" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ocr_pre_processing"/>
+            </not>
+        </preConditions>
         <createTable tableName="ocr_pre_processing" remarks="Armazena os resultados do pré-processamento OCR de documentos">
             <column name="id" type="VARCHAR(36)" remarks="Identificador único do registro (UUID)">
                 <constraints primaryKey="true" nullable="false"/>

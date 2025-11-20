@@ -7,6 +7,11 @@
 
     <changeSet id="006" author="clusterat">
         <validCheckSum>9:7342b1ce74b8b80e9c9cdab1732bd548</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="rental_properties"/>
+            </not>
+        </preConditions>
         <createTable tableName="rental_properties" remarks="Armazena informações de propriedades para aluguel">
             <column name="id" type="BIGSERIAL" remarks="Identificador único do registro">
                 <constraints primaryKey="true" nullable="false"/>

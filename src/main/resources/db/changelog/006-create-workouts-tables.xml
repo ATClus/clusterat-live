@@ -5,7 +5,12 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="010" author="clusterat">
+    <changeSet id="009" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="exercises"/>
+            </not>
+        </preConditions>
         <createTable tableName="exercises" remarks="Lista de exercícios">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -26,7 +31,12 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="011" author="clusterat">
+    <changeSet id="010" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="workout_templates"/>
+            </not>
+        </preConditions>
         <createTable tableName="workout_templates" remarks="Modelos de treino">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -45,7 +55,12 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="012" author="clusterat">
+    <changeSet id="011" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="exercises_templates"/>
+            </not>
+        </preConditions>
         <createTable tableName="exercises_templates" remarks="Relação entre exercícios e templates">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -85,7 +100,12 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="013" author="clusterat">
+    <changeSet id="012" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="workout_sessions"/>
+            </not>
+        </preConditions>
         <createTable tableName="workout_sessions" remarks="Representa o evento de ir à academia">
             <column name="id" type="UUID" remarks="Identificador único da sessão">
                 <constraints primaryKey="true" nullable="false"/>
@@ -121,7 +141,12 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="014" author="clusterat">
+    <changeSet id="013" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="workout_sets"/>
+            </not>
+        </preConditions>
         <createTable tableName="workout_sets" remarks="Granularidade máxima: cada linha é uma execução de série">
             <column name="id" type="BIGINT" autoIncrement="true" remarks="Identificador único da série">
                 <constraints primaryKey="true" nullable="false"/>
@@ -176,7 +201,12 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="015" author="clusterat">
+    <changeSet id="014" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM pg_constraint WHERE conname = 'ck_workout_sets_rpe_range';
+            </sqlCheck>
+        </preConditions>
         <sql>
             ALTER TABLE workout_sets
             ADD CONSTRAINT ck_workout_sets_rpe_range

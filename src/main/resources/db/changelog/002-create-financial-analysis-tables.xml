@@ -6,6 +6,11 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="002" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM pg_type WHERE typname = 'enum_analysis_type';
+            </sqlCheck>
+        </preConditions>
         <sql>
             CREATE TYPE enum_analysis_type AS ENUM (
                 'good',
@@ -20,6 +25,11 @@
     </changeSet>
 
     <changeSet id="003" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="expense_categories"/>
+            </not>
+        </preConditions>
         <createTable tableName="expense_categories" remarks="Categorias de despesas e receitas">
             <column name="category_id" type="SERIAL" remarks="Identificador único da categoria">
                 <constraints primaryKey="true" nullable="false"/>
@@ -83,6 +93,11 @@
     </changeSet>
 
     <changeSet id="004" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="financial_analysis"/>
+            </not>
+        </preConditions>
         <createTable tableName="financial_analysis" remarks="Análise financeira de transações">
             <column name="analysis_id" type="BIGSERIAL" remarks="Identificador único da análise">
                 <constraints primaryKey="true" nullable="false"/>
@@ -138,6 +153,11 @@
     </changeSet>
 
     <changeSet id="005" author="clusterat">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="brightdata_received_data"/>
+            </not>
+        </preConditions>
         <createTable tableName="brightdata_received_data" remarks="Dados recebidos da API Brightdata">
             <column name="id" type="BIGSERIAL" remarks="Identificador único">
                 <constraints primaryKey="true" nullable="false"/>

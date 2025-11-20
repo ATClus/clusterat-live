@@ -7,6 +7,11 @@
 
     <changeSet id="007" author="clusterat">
         <validCheckSum>9:e8733cfc38a6bcfcec84cc57ab3029ad</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="job_postings"/>
+            </not>
+        </preConditions>
         <createTable tableName="job_postings" remarks="Stores job posting information">
             <column name="id" type="BIGSERIAL" remarks="Unique record identifier">
                 <constraints primaryKey="true" nullable="false"/>

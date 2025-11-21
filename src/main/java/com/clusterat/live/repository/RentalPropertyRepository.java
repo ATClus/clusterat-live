@@ -16,5 +16,7 @@ public interface RentalPropertyRepository extends JpaRepository<RentalPropertyMo
     List<RentalPropertyModel> findByPropertyType(String propertyType);
     List<RentalPropertyModel> findByTotalMonthlyCostBetween(BigDecimal minCost, BigDecimal maxCost);
     List<RentalPropertyModel> findTop10ByOrderByScrapedAtDesc();
+    boolean existsByPropertyCode(String propertyCode);
+    void deleteByPropertyCode(String propertyCode);
 }
 

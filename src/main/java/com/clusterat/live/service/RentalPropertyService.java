@@ -131,6 +131,18 @@ public class RentalPropertyService {
         log.info("Rental property deleted with id: {}", id);
     }
 
+    @Transactional
+    public void deleteByPropertyCode(String propertyCode) {
+        log.info("Deleting rental property with property_code: {}", propertyCode);
+        if (!rentalPropertyRepository.existsByPropertyCode(propertyCode)) {
+            log.error("Property not found with property_code: {}", propertyCode);
+            throw new IllegalArgumentException("Property not found");
+        }
+
+        rentalPropertyRepository.deleteByPropertyCode(propertyCode);
+        log.info("Rental property deleted with property code: {}", propertyCode);
+    }
+
     private RentalPropertyDTO convertToDTO(RentalPropertyModel model) {
         return RentalPropertyDTO.builder()
                 .id(model.getId())

@@ -30,4 +30,13 @@ public class RentalPropertyMCPService {
                     .body(Collections.emptyList());
         }
     }
+
+    @Tool(description = "Delete property by property code")
+    public void deleteByPropertyCode(String propertyCode) {
+        try {
+            rentalPropertyService.deleteByPropertyCode(propertyCode);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to delete property by property code");
+        }
+    }
 }
